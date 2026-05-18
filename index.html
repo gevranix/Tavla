@@ -1361,5 +1361,61 @@ renderScore();
 renderColorPickers();
 nav(D.activePage||'score');
 </script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "BURAYA_API_KEY",
+  authDomain: "BURAYA_AUTH_DOMAIN",
+  projectId: "BURAYA_PROJECT_ID",
+  storageBucket: "BURAYA_STORAGE_BUCKET",
+  messagingSenderId: "BURAYA_SENDER_ID",
+  appId: "BURAYA_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let roomId = localStorage.getItem("tavla_room");
+
+if (!roomId) {
+  roomId = prompt("Oda kodu giriniz");
+  localStorage.setItem("tavla_room", roomId);
+}
+
+const roomRef = doc(db, "rooms", roomId);
+
+window.syncGame = async function(){
+  try{
+    await setDoc(roomRef, {
+      score1: typeof score1 !== 'undefined' ? score1 : 0,
+      score2: typeof score2 !== 'undefined' ? score2 : 0,
+      games: typeof games !== 'undefined' ? games : [],
+      updated: Date.now()
+    });
+  }catch(e){
+    console.log(e);
+  }
+}
+
+onSnapshot(roomRef, (snap)=>{
+  if(!snap.exists()) return;
+
+  const d = snap.data();
+
+  if(typeof score1 !== 'undefined') score1 = d.score1 || 0;
+  if(typeof score2 !== 'undefined') score2 = d.score2 || 0;
+  if(typeof games !== 'undefined') games = d.games || [];
+
+  if(typeof renderAll === 'function') renderAll();
+});
+
+setInterval(()=>{
+  if(typeof syncGame === 'function') syncGame();
+},2000);
+</script>
+
 </body>
 </html>
