@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="tr">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Tavla Pro"/>
-<meta name="theme-color" content="#0e0a05"/>
+<!-- saved from url=(0057)file:///C:/Users/PC/Downloads/tavla-pro-online%20(4).html -->
+<html lang="tr" style="--p1-c1: #b55010; --p1-c2: #e07828; --p1-c3: #f5a550; --p2-c1: #0a2e10; --p2-c2: #1a5220; --p2-c3: #308840;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tavla Pro">
+<meta name="theme-color" content="#0e0a05">
 <title>Tavla Pro</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link href="./index_files/css2" rel="stylesheet">
 <!-- Firebase v9 compat -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="./index_files/firebase-app-compat.js.indir"></script><style type="text/css" id="operaUserStyle"></style>
+<script src="./index_files/firebase-database-compat.js.indir"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
 :root{
@@ -645,7 +645,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </style>
 </head>
 <body>
-<div class="conn-bar"><div class="conn-bar-fill" id="conn-fill"></div></div>
+<div class="conn-bar"><div class="conn-bar-fill online" id="conn-fill"></div></div>
 
 <!-- Firebase Config Modal — sadece yapılandırma -->
 <div class="fb-modal-bg hidden" id="fb-modal">
@@ -654,10 +654,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="fb-modal-title">🔥 Firebase Yapılandırması</div>
     <div class="fb-modal-sub">Gerçek zamanlı senkronizasyon için Firebase bilgilerini gir.</div>
 
-    <div id="fb-status-row" style="text-align:center;margin-bottom:14px;display:none;">
+    <div id="fb-status-row" style="text-align: center; margin-bottom: 14px; display: block;">
       <div class="fb-status-pill" id="fb-status-pill">
         <div style="width:7px;height:7px;border-radius:50%;background:currentColor;"></div>
-        <span id="fb-status-txt">Bağlı</span>
+        <span id="fb-status-txt">🟢 Firebase bağlı</span>
       </div>
     </div>
 
@@ -665,19 +665,19 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="fb-cfg-title">Firebase Ayarları</div>
       <div class="fb-cfg-row">
         <div class="fb-cfg-lbl">API Key</div>
-        <input class="fb-cfg-inp" id="cfg-apiKey" placeholder="AIzaSy..."/>
+        <input class="fb-cfg-inp" id="cfg-apiKey" placeholder="AIzaSy...">
       </div>
       <div class="fb-cfg-row">
         <div class="fb-cfg-lbl">Database URL</div>
-        <input class="fb-cfg-inp" id="cfg-dbUrl" placeholder="https://proje-xxx.firebaseio.com"/>
+        <input class="fb-cfg-inp" id="cfg-dbUrl" placeholder="https://proje-xxx.firebaseio.com">
       </div>
       <div class="fb-cfg-row">
         <div class="fb-cfg-lbl">Project ID</div>
-        <input class="fb-cfg-inp" id="cfg-projectId" placeholder="proje-id"/>
+        <input class="fb-cfg-inp" id="cfg-projectId" placeholder="proje-id">
       </div>
       <button class="fb-save-btn" onclick="saveFirebaseConfig()">🔥 BAĞLAN</button>
       <div style="margin-top:12px;font-size:10px;color:var(--muted);text-align:center;line-height:1.6;">
-        <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent2);text-decoration:none;">
+        <a href="https://console.firebase.google.com/" target="_blank" style="color:var(--accent2);text-decoration:none;">
           console.firebase.google.com</a> → Realtime Database → Kural: <code style="color:var(--text2);">".read":true,".write":true</code>
       </div>
     </div>
@@ -695,7 +695,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="hdr-sub">Pro Skor Takibi</div>
     </div>
     <div class="hdr-actions">
-      <button class="icon-btn" onclick="nav('settings')" title="Ayarlar">⚙️</button>
+      <button class="icon-btn" onclick="nav(&#39;settings&#39;)" title="Ayarlar">⚙️</button>
     </div>
   </div>
 
@@ -715,14 +715,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="fl-lbl">Oyuncular</div>
           <div class="players-grid">
             <div class="pcard r" id="pcard1">
-              <div class="pcard-icon" id="pc-icon1" style="width:36px;height:36px;border-radius:50%;margin:0 auto 10px;position:relative;"></div>
+              <div class="pcard-icon" id="pc-icon1" style="width: 36px; height: 36px; border-radius: 50%; margin: 0px auto 10px; position: relative; background: radial-gradient(circle at 35% 28%, rgb(245, 165, 80), rgb(224, 120, 40) 45%, rgb(181, 80, 16)); box-shadow: rgba(181, 80, 16, 0.533) 0px 3px 12px;"></div>
               <div class="pcard-lbl" id="pcard-clbl1" style="margin-bottom:8px;">Kırmızı</div>
-              <input class="pcard-input" id="inp1" type="text" placeholder="Oyuncu 1" maxlength="14"/>
+              <input class="pcard-input" id="inp1" type="text" placeholder="Oyuncu 1" maxlength="14">
             </div>
             <div class="pcard b" id="pcard2">
-              <div class="pcard-icon" id="pc-icon2" style="width:36px;height:36px;border-radius:50%;margin:0 auto 10px;position:relative;"></div>
+              <div class="pcard-icon" id="pc-icon2" style="width: 36px; height: 36px; border-radius: 50%; margin: 0px auto 10px; position: relative; background: radial-gradient(circle at 35% 28%, rgb(48, 136, 64), rgb(26, 82, 32) 45%, rgb(10, 46, 16)); box-shadow: rgba(10, 46, 16, 0.533) 0px 3px 12px;"></div>
               <div class="pcard-lbl" id="pcard-clbl2" style="margin-bottom:8px;">Siyah</div>
-              <input class="pcard-input" id="inp2" type="text" placeholder="Oyuncu 2" maxlength="14"/>
+              <input class="pcard-input" id="inp2" type="text" placeholder="Oyuncu 2" maxlength="14">
             </div>
           </div>
         </div>
@@ -735,26 +735,24 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           </div>
           <div class="color-pick-body">
             <div class="color-pick-side">
-              <div class="cp-checker" id="prev1"></div>
-              <div class="cp-player-name" id="cpname1">OYUNCU 1</div>
-              <div class="cp-color-name" id="cpclr1">Kırmızı</div>
-              <div class="cp-swatches" id="cp1"></div>
-              <div class="custom-color-row" id="custom-color-1">
-                <input type="color" class="custom-color-input" id="custom-native-1" value="#e03030" oninput="setCustomColor(1,this.value);document.getElementById('custom-hex-1').value=this.value"/>
-                <input type="text" class="custom-hex-input" id="custom-hex-1" placeholder="#e03030" maxlength="7"
-                  oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value)){document.getElementById('custom-native-1').value=this.value;setCustomColor(1,this.value);}"/>
+              <div class="cp-checker" id="prev1" style="background: radial-gradient(circle at 35% 28%, rgb(245, 165, 80), rgb(224, 120, 40) 45%, rgb(181, 80, 16)); box-shadow: rgba(181, 80, 16, 0.6) 0px 4px 18px;"></div>
+              <div class="cp-player-name" id="cpname1">NASIR</div>
+              <div class="cp-color-name" id="cpclr1">Turuncu</div>
+              <div class="cp-swatches" id="cp1"><div class="cp-swatch" style="background:linear-gradient(135deg,#ff6055,#b02020);" title="Kırmızı" onclick="selectColor(1,0)"></div><div class="cp-swatch on" style="background:linear-gradient(135deg,#f5a550,#b55010);" title="Turuncu" onclick="selectColor(1,1)"></div><div class="cp-swatch" style="background:linear-gradient(135deg,#70a8f8,#1848b0);" title="Kobalt" onclick="selectColor(1,2)"></div><div class="cp-swatch" style="background:linear-gradient(135deg,#60d880,#1a7a30);" title="Yeşil" onclick="selectColor(1,3)"></div><div class="cp-swatch" style="background:linear-gradient(135deg,#cc78f5,#7020b8);" title="Mor" onclick="selectColor(1,4)"></div><div class="cp-swatch" style="background:linear-gradient(135deg,#f0c038,#9a6205);" title="Altın" onclick="selectColor(1,5)"></div><div class="cp-swatch" style="background:linear-gradient(135deg,#ffffff,#c0c0c0);" title="Beyaz" onclick="selectColor(1,6)"></div><div class="cp-swatch cp-custom" style="background:linear-gradient(135deg,#cccccc,#888888);border:2px dashed rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:13px;" title="Özel" onclick="selectColor(1,7)">✏️</div></div>
+              <div class="custom-color-row" id="custom-color-1" style="display: none;">
+                <input type="color" class="custom-color-input" id="custom-native-1" value="#e03030" oninput="setCustomColor(1,this.value);document.getElementById(&#39;custom-hex-1&#39;).value=this.value">
+                <input type="text" class="custom-hex-input" id="custom-hex-1" placeholder="#e03030" maxlength="7" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value)){document.getElementById(&#39;custom-native-1&#39;).value=this.value;setCustomColor(1,this.value);}">
               </div>
             </div>
             <div class="color-pick-divider"></div>
             <div class="color-pick-side">
-              <div class="cp-checker" id="prev2"></div>
-              <div class="cp-player-name" id="cpname2">OYUNCU 2</div>
-              <div class="cp-color-name" id="cpclr2">Siyah</div>
-              <div class="cp-swatches" id="cp2"></div>
-              <div class="custom-color-row" id="custom-color-2">
-                <input type="color" class="custom-color-input" id="custom-native-2" value="#3070d8" oninput="setCustomColor(2,this.value);document.getElementById('custom-hex-2').value=this.value"/>
-                <input type="text" class="custom-hex-input" id="custom-hex-2" placeholder="#3070d8" maxlength="7"
-                  oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value)){document.getElementById('custom-native-2').value=this.value;setCustomColor(2,this.value);}"/>
+              <div class="cp-checker" id="prev2" style="background: radial-gradient(circle at 35% 28%, rgb(48, 136, 64), rgb(26, 82, 32) 45%, rgb(10, 46, 16)); box-shadow: rgba(10, 46, 16, 0.6) 0px 4px 18px;"></div>
+              <div class="cp-player-name" id="cpname2">NURULLAH</div>
+              <div class="cp-color-name" id="cpclr2">Koyu Yeş</div>
+              <div class="cp-swatches" id="cp2"><div class="cp-swatch" style="background:linear-gradient(135deg,#888888,#101010);" title="Siyah" onclick="selectColor(2,0)"></div><div class="cp-swatch" style="background:linear-gradient(135deg,#4060c0,#0a1848);" title="Lacivert" onclick="selectColor(2,1)"></div><div class="cp-swatch" style="background:linear-gradient(135deg,#b06040,#4a2010);" title="Bakır" onclick="selectColor(2,2)"></div><div class="cp-swatch" style="background:linear-gradient(135deg,#308888,#083838);" title="Petrol" onclick="selectColor(2,3)"></div><div class="cp-swatch" style="background:linear-gradient(135deg,#808080,#202020);" title="Antrasit" onclick="selectColor(2,4)"></div><div class="cp-swatch on" style="background:linear-gradient(135deg,#308840,#0a2e10);" title="Koyu Yeş" onclick="selectColor(2,5)"></div><div class="cp-swatch" style="background:linear-gradient(135deg,#ffffff,#c0c0c0);" title="Beyaz" onclick="selectColor(2,6)"></div><div class="cp-swatch cp-custom" style="background:linear-gradient(135deg,#cccccc,#888888);border:2px dashed rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:13px;" title="Özel" onclick="selectColor(2,7)">✏️</div></div>
+              <div class="custom-color-row" id="custom-color-2" style="display: none;">
+                <input type="color" class="custom-color-input" id="custom-native-2" value="#3070d8" oninput="setCustomColor(2,this.value);document.getElementById(&#39;custom-hex-2&#39;).value=this.value">
+                <input type="text" class="custom-hex-input" id="custom-hex-2" placeholder="#3070d8" maxlength="7" oninput="if(/^#[0-9a-fA-F]{6}$/.test(this.value)){document.getElementById(&#39;custom-native-2&#39;).value=this.value;setCustomColor(2,this.value);}">
               </div>
             </div>
           </div>
@@ -775,30 +773,29 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <!-- Header: status dot + label + Yapılandır -->
           <div class="online-card-hd">
             <div class="online-card-title">
-              <div class="oc-status-dot" id="oc-dot"></div>
-              <span id="oc-status-txt">Çevrimdışı</span>
-              <span class="oc-status-code" id="oc-status-code"></span>
+              <div class="oc-status-dot" id="oc-dot" style="background: rgb(64, 208, 96); animation: 1.8s ease 0s infinite normal none running pulse-dot;"></div>
+              <span id="oc-status-txt">Canlı</span>
+              <span class="oc-status-code" id="oc-status-code">LLBGQC</span>
             </div>
             <div class="online-card-cfg" onclick="openFbModal()">Yapılandır</div>
           </div>
 
           <!-- Body: only shown when connected -->
-          <div class="online-card-body" id="oc-body" style="display:none;">
+          <div class="online-card-body" id="oc-body" style="display: block;">
 
             <!-- Odadayken: kod + paylaş + çık -->
-            <div id="oc-in-room" style="display:none;">
+            <div id="oc-in-room" style="display: block;">
               <div class="oc-room-inline">
-                <div class="oc-room-code-lbl" id="oc-room-num" onclick="copyRoomCode()">——</div>
+                <div class="oc-room-code-lbl" id="oc-room-num" onclick="copyRoomCode()">LLBGQC</div>
                 <button class="oc-btn share" onclick="shareRoom()">🔗 Paylaş</button>
                 <button class="oc-btn danger" onclick="leaveRoom()">🚪 Çık</button>
               </div>
             </div>
 
             <!-- Bağlı ama oda yok: kod gir veya yeni oda -->
-            <div id="oc-no-room" style="display:none;">
+            <div id="oc-no-room" style="display: none;">
               <div class="oc-join-row">
-                <input class="oc-join-input" id="oc-join-inp" placeholder="Oda Kodu"
-                  maxlength="6" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"/>
+                <input class="oc-join-input" id="oc-join-inp" placeholder="Oda Kodu" maxlength="6" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,&#39;&#39;)">
                 <button class="oc-btn primary" onclick="joinRoomFromSetup()">GİR</button>
                 <button class="oc-btn secondary" onclick="createRoom()">➕ YENİ</button>
               </div>
@@ -819,14 +816,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
         <!-- Online status chip -->
         <div class="score-online-row">
-          <div class="sco-chip" id="sco-chip" onclick="openFbModal()" title="Online Ayarlar">
+          <div class="sco-chip live" id="sco-chip" onclick="openFbModal()" title="Online Ayarlar">
             <div class="sco-chip-dot"></div>
-            <span id="sco-chip-txt">Çevrimdışı</span>
+            <span id="sco-chip-txt">🔴 CANLI · LLBGQC</span>
           </div>
-          <div class="viewer-chip" id="viewer-chip" style="display:none;">
+          <div class="viewer-chip" id="viewer-chip" style="display: inline-flex;">
             👁 <span id="viewer-count">1</span> izliyor
           </div>
-          <div class="sco-chip" id="share-chip" style="display:none;" onclick="shareRoom()">
+          <div class="sco-chip" id="share-chip" style="display: inline-flex;" onclick="shareRoom()">
             🔗 Paylaş
           </div>
         </div>
@@ -855,11 +852,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="pip-section">
             <div class="pip-col">
               <div class="pip-col-lbl">🔴 ilerleme</div>
-              <div class="dots" id="dots-r"></div>
+              <div class="dots" id="dots-r"><div class="dot "></div><div class="dot "></div><div class="dot "></div><div class="dot "></div><div class="dot "></div></div>
             </div>
             <div class="pip-col right">
               <div class="pip-col-lbl">ilerleme ⚫</div>
-              <div class="dots" id="dots-b"></div>
+              <div class="dots" id="dots-b"><div class="dot "></div><div class="dot "></div><div class="dot "></div><div class="dot "></div><div class="dot "></div></div>
             </div>
           </div>
           <div class="prog-row">
@@ -876,25 +873,25 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
 
         <!-- QUICK ADD PANEL -->
-        <div class="qa-panel" id="qa-panel">
+        <div class="qa-panel" id="qa-panel" style="opacity: 1;">
           <div class="qa-lbl">KİM KAZANDI?</div>
           <div class="qa-players">
-            <button class="qa-player" id="qa-p1" onclick="quickAdd('r')">
+            <button class="qa-player" id="qa-p1" onclick="quickAdd(&#39;r&#39;)">
               <div class="qa-av red" id="qa-av1"></div>
               <div class="qa-nm" id="qa-nm1">Oyuncu 1</div>
               <div class="qa-hint" id="qa-hint1">+1</div>
             </button>
             <div class="qa-divider">VS</div>
-            <button class="qa-player" id="qa-p2" onclick="quickAdd('b')">
+            <button class="qa-player" id="qa-p2" onclick="quickAdd(&#39;b&#39;)">
               <div class="qa-av blk" id="qa-av2"></div>
               <div class="qa-nm" id="qa-nm2">Oyuncu 2</div>
               <div class="qa-hint" id="qa-hint2">+1</div>
             </button>
           </div>
           <div class="qa-types">
-            <button class="qa-type on" id="qt-n" onclick="setQaType('n')"><span>🎲</span> Normal · 1p</button>
-            <button class="qa-type" id="qt-m" onclick="setQaType('m')"><span>🔥</span> Mars · 2p</button>
-            <button class="qa-type" id="qt-g" onclick="setQaType('g')"><span>🌹</span> Gül · 4p</button>
+            <button class="qa-type on" id="qt-n" onclick="setQaType(&#39;n&#39;)"><span>🎲</span> Normal · 1p</button>
+            <button class="qa-type" id="qt-m" onclick="setQaType(&#39;m&#39;)"><span>🔥</span> Mars · 2p</button>
+            <button class="qa-type" id="qt-g" onclick="setQaType(&#39;g&#39;)"><span>🌹</span> Gül · 4p</button>
           </div>
           <button class="qa-undo" onclick="undoGame()">↩ Geri Al</button>
         </div>
@@ -904,7 +901,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
             <span class="card-hd-title">Oyun Geçmişi</span>
             <button class="icon-btn" style="width:28px;height:28px;font-size:13px;border-radius:8px;" onclick="clearGames()">🗑️</button>
           </div>
-          <div class="hist-list" id="hist"></div>
+          <div class="hist-list" id="hist"><div class="empty">Henüz oyun yok.</div></div>
         </div>
 
       </div>
@@ -940,7 +937,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="card-hd"><span class="card-hd-title">Şeref Listesi</span></div>
           <div class="card-body" id="hall-of-fame"></div>
         </div>
-        <button class="go-btn" onclick="nav('setup')" style="margin-top:4px;">🔄 &nbsp;YENİ MAÇ</button>
+        <button class="go-btn" onclick="nav(&#39;setup&#39;)" style="margin-top:4px;">🔄 &nbsp;YENİ MAÇ</button>
         <div style="height:4px;"></div>
       </div>
     </div>
@@ -951,7 +948,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="settings-section">
           <div class="settings-lbl">Tema</div>
           <div class="theme-list">
-            <div class="theme-row on" data-theme="" onclick="setTheme(this,'')">
+            <div class="theme-row on" data-theme="" onclick="setTheme(this,&#39;&#39;)">
               <div class="theme-preview" style="background:#1f1509;">
                 <div class="theme-preview-bar" style="background:linear-gradient(90deg,#c8922a,#e8b84b);"></div>
               </div>
@@ -961,7 +958,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               </div>
               <div class="theme-radio"></div>
             </div>
-            <div class="theme-row" data-theme="theme-blue" onclick="setTheme(this,'theme-blue')">
+            <div class="theme-row" data-theme="theme-blue" onclick="setTheme(this,&#39;theme-blue&#39;)">
               <div class="theme-preview" style="background:#091020;">
                 <div class="theme-preview-bar" style="background:linear-gradient(90deg,#2a78c8,#4ba0e8);"></div>
               </div>
@@ -971,7 +968,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               </div>
               <div class="theme-radio"></div>
             </div>
-            <div class="theme-row" data-theme="theme-green" onclick="setTheme(this,'theme-green')">
+            <div class="theme-row" data-theme="theme-green" onclick="setTheme(this,&#39;theme-green&#39;)">
               <div class="theme-preview" style="background:#091a10;">
                 <div class="theme-preview-bar" style="background:linear-gradient(90deg,#28a848,#40d060);"></div>
               </div>
@@ -981,7 +978,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               </div>
               <div class="theme-radio"></div>
             </div>
-            <div class="theme-row" data-theme="theme-purple" onclick="setTheme(this,'theme-purple')">
+            <div class="theme-row" data-theme="theme-purple" onclick="setTheme(this,&#39;theme-purple&#39;)">
               <div class="theme-preview" style="background:#120a20;">
                 <div class="theme-preview-bar" style="background:linear-gradient(90deg,#8a2ac8,#aa4be8);"></div>
               </div>
@@ -991,7 +988,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               </div>
               <div class="theme-radio"></div>
             </div>
-            <div class="theme-row" data-theme="theme-light" onclick="setTheme(this,'theme-light')">
+            <div class="theme-row" data-theme="theme-light" onclick="setTheme(this,&#39;theme-light&#39;)">
               <div class="theme-preview" style="background:#fff8ee;border:1px solid #ddd;">
                 <div class="theme-preview-bar" style="background:linear-gradient(90deg,#8a6010,#b08020);"></div>
               </div>
@@ -1001,7 +998,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               </div>
               <div class="theme-radio"></div>
             </div>
-            <div class="theme-row" data-theme="theme-day" onclick="setTheme(this,'theme-day')">
+            <div class="theme-row" data-theme="theme-day" onclick="setTheme(this,&#39;theme-day&#39;)">
               <div class="theme-preview" style="background:#eef3ff;border:1px solid #c0ccee;">
                 <div class="theme-preview-bar" style="background:linear-gradient(90deg,#2255cc,#6698ff);"></div>
               </div>
@@ -1011,7 +1008,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               </div>
               <div class="theme-radio"></div>
             </div>
-            <div class="theme-row" data-theme="theme-rose" onclick="setTheme(this,'theme-rose')">
+            <div class="theme-row" data-theme="theme-rose" onclick="setTheme(this,&#39;theme-rose&#39;)">
               <div class="theme-preview" style="background:#fff0f6;border:1px solid #f0c0d0;">
                 <div class="theme-preview-bar" style="background:linear-gradient(90deg,#c02060,#f870a0);"></div>
               </div>
@@ -1021,7 +1018,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               </div>
               <div class="theme-radio"></div>
             </div>
-            <div class="theme-row" data-theme="theme-sand" onclick="setTheme(this,'theme-sand')">
+            <div class="theme-row" data-theme="theme-sand" onclick="setTheme(this,&#39;theme-sand&#39;)">
               <div class="theme-preview" style="background:#f8f0e0;border:1px solid #d8c898;">
                 <div class="theme-preview-bar" style="background:linear-gradient(90deg,#8a6020,#d4a848);"></div>
               </div>
@@ -1031,7 +1028,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               </div>
               <div class="theme-radio"></div>
             </div>
-            <div class="theme-row" data-theme="theme-mint" onclick="setTheme(this,'theme-mint')">
+            <div class="theme-row" data-theme="theme-mint" onclick="setTheme(this,&#39;theme-mint&#39;)">
               <div class="theme-preview" style="background:#eaf8f0;border:1px solid #a8dcc4;">
                 <div class="theme-preview-bar" style="background:linear-gradient(90deg,#187850,#38c880);"></div>
               </div>
@@ -1051,14 +1048,14 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               <div class="settings-row-title">Konfeti Efekti</div>
               <div class="settings-row-sub">Galibiyet animasyonu</div>
             </div>
-            <div class="toggle on" id="tog-confetti" onclick="toggleSetting('confetti')"><div class="toggle-thumb"></div></div>
+            <div class="toggle on" id="tog-confetti" onclick="toggleSetting(&#39;confetti&#39;)"><div class="toggle-thumb"></div></div>
           </div>
           <div class="settings-row">
             <div class="settings-row-info">
               <div class="settings-row-title">Ses Efektleri</div>
               <div class="settings-row-sub">Oyun sesi (ileride)</div>
             </div>
-            <div class="toggle" id="tog-sound" onclick="toggleSetting('sound')"><div class="toggle-thumb"></div></div>
+            <div class="toggle" id="tog-sound" onclick="toggleSetting(&#39;sound&#39;)"><div class="toggle-thumb"></div></div>
           </div>
         </div>
 
@@ -1066,8 +1063,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="settings-lbl">Kayıtlar &amp; Yedekleme</div>
           <div class="record-info" id="record-info"></div>
           <button class="export-btn accent" onclick="exportData()">📤 &nbsp;Verileri Dışa Aktar (JSON)</button>
-          <button class="export-btn" onclick="document.getElementById('import-input').click()">📥 &nbsp;Verileri İçe Aktar</button>
-          <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)"/>
+          <button class="export-btn" onclick="document.getElementById(&#39;import-input&#39;).click()">📥 &nbsp;Verileri İçe Aktar</button>
+          <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
           <button class="export-btn" onclick="shareText()">📋 &nbsp;Maç Özetini Kopyala</button>
         </div>
 
@@ -1076,7 +1073,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="settings-row" onclick="openFbModal()" style="cursor:pointer;">
             <div class="settings-row-info">
               <div class="settings-row-title">🔥 Firebase Bağlantısı</div>
-              <div class="settings-row-sub" id="settings-fb-status">Firebase yapılandır &amp; oda yönet</div>
+              <div class="settings-row-sub" id="settings-fb-status">Oda: LLBGQC</div>
             </div>
             <div style="font-size:18px;">›</div>
           </div>
@@ -1097,26 +1094,26 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
   <!-- BOTTOM NAV -->
   <div class="bnav">
-    <button class="nb" id="nb-setup" onclick="nav('setup')">
+    <button class="nb on" id="nb-setup" onclick="nav(&#39;setup&#39;)">
       <span class="nb-icon">🏠</span><span class="nb-lbl">Kurulum</span><div class="nb-dot"></div>
     </button>
-    <button class="nb on" id="nb-score" onclick="nav('score')">
+    <button class="nb" id="nb-score" onclick="nav(&#39;score&#39;)">
       <span class="nb-icon">🎯</span><span class="nb-lbl">Skor</span><div class="nb-dot"></div>
     </button>
-    <button class="nb" id="nb-matches" onclick="nav('matches')">
+    <button class="nb" id="nb-matches" onclick="nav(&#39;matches&#39;)">
       <span class="nb-icon">📋</span><span class="nb-lbl">Maçlar</span><div class="nb-dot"></div>
     </button>
-    <button class="nb" id="nb-stats" onclick="nav('stats')">
+    <button class="nb" id="nb-stats" onclick="nav(&#39;stats&#39;)">
       <span class="nb-icon">📊</span><span class="nb-lbl">İstatistik</span><div class="nb-dot"></div>
     </button>
-    <button class="nb" id="nb-settings" onclick="nav('settings')">
+    <button class="nb" id="nb-settings" onclick="nav(&#39;settings&#39;)">
       <span class="nb-icon">⚙️</span><span class="nb-lbl">Ayarlar</span><div class="nb-dot"></div>
     </button>
   </div>
 
 </div><!-- /app -->
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast">✅ Oda oluşturuldu: LLBGQC</div>
 
 <!-- WINNER OVERLAY -->
 <div class="win-ov" id="win-ov">
@@ -1889,6 +1886,40 @@ function shareRoom(){
   else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('🔗 Link kopyalandı: '+fbRoomCode));}
 }
 
+// ─── Update setup-page online card ───────────────────────────────────────────
+function updateSetupOnlineCard(){
+  const dot    = document.getElementById('oc-dot');
+  const txt    = document.getElementById('oc-status-txt');
+  const code   = document.getElementById('oc-status-code');
+  const body   = document.getElementById('oc-body');
+  const inRoom = document.getElementById('oc-in-room');
+  const noRoom = document.getElementById('oc-no-room');
+  const roomNum= document.getElementById('oc-room-num');
+  if(!txt) return;
+
+  if(!fbConnected){
+    if(dot){ dot.style.background='var(--muted)'; dot.style.animation=''; }
+    txt.textContent = 'Çevrimdışı';
+    if(code) code.textContent = '';
+    if(body) body.style.display = 'none';
+  } else if(fbRoomCode){
+    if(dot){ dot.style.background='#40d060'; dot.style.animation='pulse-dot 1.8s infinite'; }
+    txt.textContent = 'Canlı';
+    if(code)    code.textContent   = fbRoomCode;
+    if(roomNum) roomNum.textContent = fbRoomCode;
+    if(body)    body.style.display  = 'block';
+    if(inRoom)  inRoom.style.display = 'block';
+    if(noRoom)  noRoom.style.display = 'none';
+  } else {
+    if(dot){ dot.style.background='var(--accent2)'; dot.style.animation=''; }
+    txt.textContent = 'Bağlı';
+    if(code) code.textContent = '';
+    if(body) body.style.display = 'block';
+    if(inRoom) inRoom.style.display = 'none';
+    if(noRoom) noRoom.style.display = 'block';
+  }
+}
+
 // ─── Copy room code ───────────────────────────────────────────────────────────
 function copyRoomCode(){
   if(!fbRoomCode)return;
@@ -1970,5 +2001,6 @@ initFbModalListener();
 })();
 
 </script>
-</body>
-</html>
+
+
+</body></html>
