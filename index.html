@@ -647,42 +647,43 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <body>
 <div class="conn-bar"><div class="conn-bar-fill online" id="conn-fill"></div></div>
 
-<!-- Firebase Config Modal — sadece yapılandırma -->
+<!-- Canlı Mod Modal -->
 <div class="fb-modal-bg hidden" id="fb-modal">
   <div class="fb-modal">
     <div class="fb-modal-drag"></div>
-    <div class="fb-modal-title">🔥 Firebase Yapılandırması</div>
-    <div class="fb-modal-sub">Gerçek zamanlı senkronizasyon için Firebase bilgilerini gir.</div>
+    <div class="fb-modal-title">📡 Canlı Mod</div>
+    <div class="fb-modal-sub">Başka cihazlarla gerçek zamanlı skor senkronizasyonu.</div>
 
-    <div id="fb-status-row" style="text-align: center; margin-bottom: 14px; display: block;">
+    <div id="fb-status-row" style="text-align:center;margin-bottom:14px;display:block;">
       <div class="fb-status-pill" id="fb-status-pill">
         <div style="width:7px;height:7px;border-radius:50%;background:currentColor;"></div>
-        <span id="fb-status-txt">🟢 Firebase bağlı</span>
+        <span id="fb-status-txt">Bağlanıyor...</span>
       </div>
     </div>
 
-    <div class="fb-cfg-section" id="cfg-section">
-      <div class="fb-cfg-title">Firebase Ayarları</div>
-      <div class="fb-cfg-row">
-        <div class="fb-cfg-lbl">API Key</div>
-        <input class="fb-cfg-inp" id="cfg-apiKey" placeholder="AIzaSy...">
-      </div>
-      <div class="fb-cfg-row">
-        <div class="fb-cfg-lbl">Database URL</div>
-        <input class="fb-cfg-inp" id="cfg-dbUrl" placeholder="https://proje-xxx.firebaseio.com">
-      </div>
-      <div class="fb-cfg-row">
-        <div class="fb-cfg-lbl">Project ID</div>
-        <input class="fb-cfg-inp" id="cfg-projectId" placeholder="proje-id">
-      </div>
-      <button class="fb-save-btn" onclick="saveFirebaseConfig()">🔥 BAĞLAN</button>
-      <div style="margin-top:12px;font-size:10px;color:var(--muted);text-align:center;line-height:1.6;">
-        <a href="https://console.firebase.google.com/" target="_blank" style="color:var(--accent2);text-decoration:none;">
-          console.firebase.google.com</a> → Realtime Database → Kural: <code style="color:var(--text2);">".read":true,".write":true</code>
+    <!-- Odada değilken -->
+    <div id="fb-no-room-section">
+      <button class="fb-save-btn" onclick="createRoom()" style="margin-bottom:10px;">🎲 YENİ ODA OLUŞTUR</button>
+      <div style="text-align:center;font-size:11px;color:var(--muted2);margin-bottom:10px;">— veya mevcut odaya katıl —</div>
+      <div class="oc-join-row" style="margin-bottom:4px;">
+        <input class="oc-join-input" id="join-code-inp" maxlength="6" placeholder="ODA KODU" style="flex:1;">
+        <button class="oc-btn primary" onclick="joinRoom()">GİR</button>
       </div>
     </div>
 
-    <button class="room-btn create full" onclick="closeFbModal()" style="margin-top:4px;">Kapat</button>
+    <!-- Odadayken -->
+    <div id="fb-in-room-section" style="display:none;">
+      <div class="setup-room-code">
+        <div class="setup-room-code-num" onclick="copyRoomCode()" id="fb-modal-room-code">——</div>
+        <div class="setup-room-code-hint">Koda dokun → linki kopyala</div>
+      </div>
+      <div class="oc-btns">
+        <button class="oc-btn share" onclick="shareRoom()">🔗 Paylaş</button>
+        <button class="oc-btn danger" onclick="leaveRoom()">✕ Odadan Çık</button>
+      </div>
+    </div>
+
+    <button class="room-btn create full" onclick="closeFbModal()" style="margin-top:8px;">Kapat</button>
   </div>
 </div>
 
@@ -777,7 +778,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
               <span id="oc-status-txt">Canlı</span>
               <span class="oc-status-code" id="oc-status-code">LLBGQC</span>
             </div>
-            <div class="online-card-cfg" onclick="openFbModal()">Yapılandır</div>
+            <div class="online-card-cfg" onclick="openFbModal()">📡 Canlı Mod</div>
           </div>
 
           <!-- Body: only shown when connected -->
@@ -1607,9 +1608,16 @@ let fbRemoteUpdate=false; // flag: prevent echo loop
 const FB_CFG_KEY='tavla_fb_cfg';
 const FB_ROOM_KEY='tavla_fb_room';
 
+// ─── Gömülü Firebase config (kullanıcı girmez) ───────────────────────────────
+const BUILTIN_FB_CFG={
+  apiKey:"AIzaSyCMTZ02X_bV5YHHOA1Rv2V0KHXo1vqn3x8",
+  dbUrl:"https://tavla-49-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"tavla-49"
+};
+
 // ─── Config persistence ───────────────────────────────────────────────────────
-function getFbCfg(){try{return JSON.parse(localStorage.getItem(FB_CFG_KEY)||'null');}catch{return null;}}
-function saveFbCfg(c){localStorage.setItem(FB_CFG_KEY,JSON.stringify(c));}
+function getFbCfg(){return BUILTIN_FB_CFG;}
+function saveFbCfg(c){/* artık gerekmez — config gömülü */}
 function getSavedRoom(){return localStorage.getItem(FB_ROOM_KEY)||null;}
 function saveRoomCode(code){if(code)localStorage.setItem(FB_ROOM_KEY,code);else localStorage.removeItem(FB_ROOM_KEY);}
 
@@ -1677,75 +1685,53 @@ function setConnUI(online, state){
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
 function openFbModal(){
-  const cfg=getFbCfg();
   const modal=document.getElementById('fb-modal');
   modal.classList.remove('hidden');
-  // prefill cfg
-  if(cfg){
-    document.getElementById('cfg-apiKey').value=cfg.apiKey||'';
-    document.getElementById('cfg-dbUrl').value=cfg.dbUrl||'';
-    document.getElementById('cfg-projectId').value=cfg.projectId||'';
-  }
   updateFbModal();
 }
 function closeFbModal(){document.getElementById('fb-modal').classList.add('hidden');}
 function initFbModalListener(){document.getElementById('fb-modal').addEventListener('click',e=>{if(e.target===document.getElementById('fb-modal'))closeFbModal();});}
 
 function updateFbModal(){
-  const cfg=getFbCfg();
-  const statusRow=document.getElementById('fb-status-row');
   const pill=document.getElementById('fb-status-pill');
   const pillTxt=document.getElementById('fb-status-txt');
-  if(fbConnected){
-    statusRow.style.display='block';
-    pill.className='fb-status-pill';
-    pillTxt.textContent='🟢 Firebase bağlı';
+  const noRoom=document.getElementById('fb-no-room-section');
+  const inRoom=document.getElementById('fb-in-room-section');
+  const codeEl=document.getElementById('fb-modal-room-code');
+
+  if(fbConnected && fbRoomCode){
+    if(pill){pill.className='fb-status-pill';pillTxt.textContent='🟢 Canlı · Oda: '+fbRoomCode;}
+    if(noRoom)noRoom.style.display='none';
+    if(inRoom)inRoom.style.display='block';
+    if(codeEl)codeEl.textContent=fbRoomCode;
+  } else if(fbConnected){
+    if(pill){pill.className='fb-status-pill';pillTxt.textContent='🟢 Bağlı, oda yok';}
+    if(noRoom)noRoom.style.display='block';
+    if(inRoom)inRoom.style.display='none';
   } else {
-    statusRow.style.display=cfg?'block':'none';
-    if(cfg&&statusRow.style.display!=='none'){
-      pill.className='fb-status-pill warn';
-      pillTxt.textContent='⚠️ Bağlanıyor...';
-    }
-  }
-  // prefill inputs from saved config
-  if(cfg){
-    const a=document.getElementById('cfg-apiKey');
-    const d=document.getElementById('cfg-dbUrl');
-    const p=document.getElementById('cfg-projectId');
-    if(a&&!a.value)a.value=cfg.apiKey||'';
-    if(d&&!d.value)d.value=cfg.dbUrl||'';
-    if(p&&!p.value)p.value=cfg.projectId||'';
+    if(pill){pill.className='fb-status-pill warn';pillTxt.textContent='⚡ Bağlanıyor...';}
+    if(noRoom)noRoom.style.display='block';
+    if(inRoom)inRoom.style.display='none';
   }
 }
 
-// ─── Save config & connect ────────────────────────────────────────────────────
-function saveFirebaseConfig(){
-  const apiKey=document.getElementById('cfg-apiKey').value.trim();
-  const dbUrl=document.getElementById('cfg-dbUrl').value.trim();
-  const projectId=document.getElementById('cfg-projectId').value.trim();
-  if(!apiKey||!dbUrl){showToast('❌ API Key ve Database URL zorunlu');return;}
-  const cfg={apiKey,dbUrl,projectId};
-  saveFbCfg(cfg);
-  const ok=initFirebase(cfg);
-  if(ok){showToast('🔥 Firebase bağlandı!');setTimeout(()=>{closeFbModal();updateSetupOnlineCard();},600);}
-  else{showToast('❌ Bağlantı hatası — URL ve Key\u2019i kontrol et');}
-  updateFbModal();
-}
+// ─── saveFirebaseConfig artık kullanılmıyor (config gömülü) ──────────────────
+function saveFirebaseConfig(){/* no-op */}
 
 // ─── Room create / join / leave ───────────────────────────────────────────────
 function createRoom(){
-  if(!fbDb){showToast('❌ Önce Firebase yapılandır');return;}
+  if(!fbDb){showToast('⏳ Bağlanılıyor, lütfen bekle...');return;}
   const code=genCode();
   joinRoomByCode(code,true);
 }
 function joinRoom(){
-  if(!fbDb){showToast('❌ Önce Firebase yapılandır');return;}
+  if(!fbDb){showToast('⏳ Bağlanılıyor, lütfen bekle...');return;}
   const code=document.getElementById('join-code-inp').value.trim().toUpperCase();
   if(code.length<4){showToast('❌ Geçerli bir oda kodu gir');return;}
   joinRoomByCode(code,false);
 }
 function joinRoomFromSetup(){
-  if(!fbDb){showToast('❌ Önce Firebase yapılandır');openFbModal();return;}
+  if(!fbDb){showToast('⏳ Bağlanılıyor, lütfen bekle...');openFbModal();return;}
   const code=document.getElementById('oc-join-inp').value.trim().toUpperCase();
   if(code.length<4){showToast('❌ Geçerli bir oda kodu gir');return;}
   joinRoomByCode(code,false);
@@ -1937,17 +1923,11 @@ function checkUrlRoom(){
   const params=new URLSearchParams(window.location.search);
   const roomParam=params.get('room');
   if(roomParam&&roomParam.length>=4){
-    const cfg=getFbCfg();
-    if(cfg&&initFirebase(cfg)){
-      setTimeout(()=>joinRoomByCode(roomParam.toUpperCase(),false),800);
-    }
+    if(fbDb) setTimeout(()=>joinRoomByCode(roomParam.toUpperCase(),false),400);
   } else {
     const saved=getSavedRoom();
-    if(saved){
-      const cfg=getFbCfg();
-      if(cfg&&initFirebase(cfg)){
-        setTimeout(()=>joinRoomByCode(saved,false),800);
-      }
+    if(saved && fbDb){
+      setTimeout(()=>joinRoomByCode(saved,false),400);
     }
   }
 }
@@ -1988,16 +1968,13 @@ renderColorPickers();
 nav(D.activePage||'score');
 initFbModalListener();
 
-// ── Firebase auto-init & room auto-rejoin ──────────────────────────────────
+// ── Firebase otomatik başlat (config gömülü) ───────────────────────────────
 (function(){
-  const cfg = getFbCfg();
-  if(cfg && cfg.apiKey && cfg.dbUrl){
-    try{
-      initFirebase(cfg);
-      // Small delay to let Firebase connect then auto-rejoin
-      setTimeout(checkUrlRoom, 600);
-    }catch(e){console.warn('Firebase auto-init failed', e);}
-  }
+  try{
+    initFirebase(BUILTIN_FB_CFG);
+    // Kayıtlı oda varsa veya URL'de oda kodu varsa otomatik katıl
+    setTimeout(checkUrlRoom, 800);
+  }catch(e){console.warn('Firebase auto-init failed', e);}
 })();
 
 </script>
