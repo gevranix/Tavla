@@ -11,8 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link href="./index_files/css2" rel="stylesheet">
 <!-- Firebase v9 compat -->
-<script src="./index_files/firebase-app-compat.js.indir"></script><style type="text/css" id="operaUserStyle"></style>
-<script src="./index_files/firebase-database-compat.js.indir"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
 :root{
@@ -1687,6 +1687,12 @@ function setConnUI(online, state){
 function openFbModal(){
   const modal=document.getElementById('fb-modal');
   modal.classList.remove('hidden');
+  // Kullanıcı modal'ı ilk kez açtığında Firebase'i başlat
+  if(!fbApp){
+    try{
+      initFirebase(BUILTIN_FB_CFG);
+    }catch(e){console.warn('Firebase init failed',e);}
+  }
   updateFbModal();
 }
 function closeFbModal(){document.getElementById('fb-modal').classList.add('hidden');}
@@ -1968,13 +1974,19 @@ renderColorPickers();
 nav(D.activePage||'score');
 initFbModalListener();
 
-// ── Firebase otomatik başlat (config gömülü) ───────────────────────────────
+// ── Firebase sadece kullanıcı isteğiyle başlar ─────────────────────────────
+// URL'de ?room= varsa otomatik katıl (paylaşılan link ile açıldı)
 (function(){
-  try{
-    initFirebase(BUILTIN_FB_CFG);
-    // Kayıtlı oda varsa veya URL'de oda kodu varsa otomatik katıl
-    setTimeout(checkUrlRoom, 800);
-  }catch(e){console.warn('Firebase auto-init failed', e);}
+  const params=new URLSearchParams(window.location.search);
+  const roomParam=params.get('room');
+  if(roomParam && roomParam.length>=4){
+    // Link ile gelindi — Firebase başlat ve odaya katıl
+    try{
+      initFirebase(BUILTIN_FB_CFG);
+      setTimeout(()=>joinRoomByCode(roomParam.toUpperCase(),false), 800);
+    }catch(e){console.warn('Firebase link-join failed', e);}
+  }
+  // Kayıtlı oda varsa bile otomatik bağlanma — kullanıcı seçsin
 })();
 
 </script>
