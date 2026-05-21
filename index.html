@@ -497,7 +497,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 /* Connection status bar */
 .conn-bar{position:fixed;top:calc(var(--safe-top) + 0px);left:0;right:0;z-index:200;
-  height:3px;background:var(--border);overflow:hidden;}
+  height:3px;background:var(--border);overflow:hidden;pointer-events:none;}
 .conn-bar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));
   transition:width .4s,background .4s;}
 .conn-bar-fill.online{width:100%;background:linear-gradient(90deg,#28a848,#40d060);}
@@ -1091,7 +1091,7 @@ let D = {
 };
 
 function load(){try{const r=localStorage.getItem('tavla_pro3');if(r)D=JSON.parse(r);}catch(e){}}
-function save(){localStorage.setItem('tavla_pro3',JSON.stringify(D));}
+function _saveLocal(){localStorage.setItem('tavla_pro3',JSON.stringify(D));}
 
 /* ═══════════════ NAVIGATION ═══════════════ */
 const PAGES=['setup','score','matches','stats','settings'];
@@ -1617,7 +1617,7 @@ function openFbModal(){
   updateFbModal();
 }
 function closeFbModal(){document.getElementById('fb-modal').classList.add('hidden');}
-document.getElementById('fb-modal').addEventListener('click',e=>{if(e.target===document.getElementById('fb-modal'))closeFbModal();});
+function initFbModalListener(){document.getElementById('fb-modal').addEventListener('click',e=>{if(e.target===document.getElementById('fb-modal'))closeFbModal();});}
 
 function updateFbModal(){
   const cfg=getFbCfg();
@@ -1662,7 +1662,7 @@ function saveFirebaseConfig(){
   saveFbCfg(cfg);
   const ok=initFirebase(cfg);
   if(ok){showToast('🔥 Firebase bağlandı!');}
-  else{showToast('❌ Bağlantı hatası — URL ve Key'i kontrol et');}
+  else{showToast('❌ Bağlantı hatası — URL ve Key\u2019i kontrol et');}
   updateFbModal();
 }
 
@@ -1844,7 +1844,7 @@ function checkUrlRoom(){
 const _origSave=save;
 // Override save with Firebase push
 function save(){
-  localStorage.setItem('tavla_pro3',JSON.stringify(D));
+  _saveLocal();
   if(!fbRemoteUpdate&&fbRoomRef&&fbConnected) pushToFirebase();
 }
 
@@ -1874,6 +1874,7 @@ document.getElementById('inp2').value=D.p2==='Oyuncu 2'?'':D.p2;
 renderScore();
 renderColorPickers();
 nav(D.activePage||'score');
+initFbModalListener();
 
 // ── Firebase auto-init & room auto-rejoin ──────────────────────────────────
 (function(){
