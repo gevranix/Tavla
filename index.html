@@ -583,19 +583,77 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .viewer-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;
   border-radius:20px;font-size:10px;font-weight:700;
   background:var(--card);border:1px solid var(--border);color:var(--muted2);}
+
+/* ═══ SETUP PAGE ONLINE CARD ═══ */
+.online-card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:2px;}
+.online-card-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border);}
+.online-card-title{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;font-weight:700;}
+.online-card-cfg{font-size:11px;color:var(--accent2);cursor:pointer;padding:4px 10px;border-radius:10px;border:1px solid var(--border2);background:var(--card2);}
+.online-card-body{padding:14px;}
+
+/* Status row inside online card */
+.oc-status{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;
+  border-radius:12px;background:var(--bg3);border:1px solid var(--border);}
+.oc-status-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+.oc-status.connected .oc-status-dot{background:#40d060;animation:pulse-dot 1.8s infinite;}
+.oc-status.syncing .oc-status-dot{background:var(--accent2);}
+.oc-status-txt{font-size:12px;font-weight:700;color:var(--text2);flex:1;}
+.oc-status-code{font-family:'Cinzel',serif;font-size:14px;font-weight:900;color:var(--accent2);letter-spacing:3px;}
+
+/* Room code big display on setup */
+.setup-room-code{background:var(--bg3);border:1.5px dashed var(--border2);border-radius:14px;
+  padding:14px;margin-bottom:10px;text-align:center;}
+.setup-room-code-num{font-family:'Cinzel',serif;font-size:30px;font-weight:900;
+  color:var(--accent2);letter-spacing:8px;cursor:pointer;}
+.setup-room-code-hint{font-size:10px;color:var(--muted);margin-top:4px;}
+
+/* Two action buttons side by side */
+.oc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.oc-btn{padding:12px 8px;border-radius:12px;border:none;cursor:pointer;font-size:13px;
+  font-weight:700;letter-spacing:.5px;transition:all .2s;font-family:'Nunito',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:6px;}
+.oc-btn:active{transform:scale(.95);}
+.oc-btn.primary{background:linear-gradient(135deg,var(--accent1),var(--accent2));color:var(--bg);}
+.oc-btn.secondary{background:var(--card2);border:1px solid var(--border2);color:var(--text2);}
+.oc-btn.danger{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.35);color:#e74c3c;}
+.oc-btn.share{background:rgba(40,168,72,.15);border:1px solid rgba(40,168,72,.35);color:#40d060;}
+.oc-btn.full{grid-column:1/-1;}
+
+/* Join input row */
+.oc-join-row{display:flex;gap:8px;margin-bottom:8px;}
+.oc-join-input{flex:1;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);
+  padding:11px 12px;border-radius:12px;font-size:16px;font-weight:800;letter-spacing:4px;
+  text-transform:uppercase;text-align:center;outline:none;font-family:'Cinzel',serif;}
+.oc-join-input::placeholder{color:var(--muted);letter-spacing:1px;font-size:12px;font-weight:400;}
+.oc-join-input:focus{border-color:var(--accent1);}
+
+
+/* compact room inline row */
+.oc-room-inline{display:flex;align-items:center;gap:8px;}
+.oc-room-code-lbl{font-family:'Cinzel',serif;font-size:20px;font-weight:900;
+  color:var(--accent2);letter-spacing:5px;flex:1;cursor:pointer;}
+.oc-btn{padding:9px 12px;border-radius:10px;border:none;cursor:pointer;font-size:12px;
+  font-weight:700;transition:all .2s;font-family:'Nunito',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;}
+.oc-join-row{display:flex;gap:7px;align-items:center;}
+.oc-join-input{flex:1;min-width:0;background:var(--bg3);border:1.5px solid var(--border2);color:var(--text);
+  padding:9px 10px;border-radius:10px;font-size:15px;font-weight:800;letter-spacing:4px;
+  text-transform:uppercase;text-align:center;outline:none;font-family:'Cinzel',serif;}
+.oc-join-input:focus{border-color:var(--accent1);}
+.online-card-body{padding:0 14px 12px;}
+
 </style>
 </head>
 <body>
 <div class="conn-bar"><div class="conn-bar-fill" id="conn-fill"></div></div>
 
-<!-- Firebase Config & Room Modal -->
+<!-- Firebase Config Modal — sadece yapılandırma -->
 <div class="fb-modal-bg hidden" id="fb-modal">
   <div class="fb-modal">
     <div class="fb-modal-drag"></div>
-    <div class="fb-modal-title">🔥 Online Bağlantı</div>
-    <div class="fb-modal-sub" id="fb-modal-sub">Firebase ile tüm oyuncular aynı skoru gerçek zamanlı takip eder.</div>
+    <div class="fb-modal-title">🔥 Firebase Yapılandırması</div>
+    <div class="fb-modal-sub">Gerçek zamanlı senkronizasyon için Firebase bilgilerini gir.</div>
 
-    <!-- Connection status -->
     <div id="fb-status-row" style="text-align:center;margin-bottom:14px;display:none;">
       <div class="fb-status-pill" id="fb-status-pill">
         <div style="width:7px;height:7px;border-radius:50%;background:currentColor;"></div>
@@ -603,28 +661,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
     </div>
 
-    <!-- Room section (shown when connected) -->
-    <div class="room-section" id="room-section" style="display:none;">
-      <div class="room-section-title">Aktif Oda</div>
-      <div class="room-code-display" id="room-code-display" onclick="copyRoomCode()" title="Kopyala">——</div>
-      <div class="room-code-hint">👆 Kodu paylaş → arkadaşlar aynı odaya katılsın</div>
-      <div style="display:flex;gap:8px;">
-        <button class="room-btn leave full" onclick="leaveRoom()">🚪 Odadan Çık</button>
-      </div>
-    </div>
-
-    <!-- Join/Create room (shown when connected but no room) -->
-    <div class="room-section" id="join-section" style="display:none;">
-      <div class="room-section-title">Odaya Katıl veya Oluştur</div>
-      <div class="room-input-row">
-        <input class="room-input" id="join-code-inp" placeholder="Oda Kodu" maxlength="6"
-          oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" />
-        <button class="room-btn join" onclick="joinRoom()">GİR</button>
-      </div>
-      <button class="room-btn create full" onclick="createRoom()">➕ Yeni Oda Oluştur</button>
-    </div>
-
-    <!-- Firebase config (shown when not configured) -->
     <div class="fb-cfg-section" id="cfg-section">
       <div class="fb-cfg-title">Firebase Ayarları</div>
       <div class="fb-cfg-row">
@@ -642,7 +678,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <button class="fb-save-btn" onclick="saveFirebaseConfig()">🔥 BAĞLAN</button>
       <div style="margin-top:12px;font-size:10px;color:var(--muted);text-align:center;line-height:1.6;">
         <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent2);text-decoration:none;">
-          console.firebase.google.com</a> → Proje oluştur → Realtime Database → Kural: <code style="color:var(--text2);">".read":true, ".write":true</code>
+          console.firebase.google.com</a> → Realtime Database → Kural: <code style="color:var(--text2);">".read":true,".write":true</code>
       </div>
     </div>
 
@@ -731,6 +767,43 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
             <button class="tbtn on" onclick="setTgt(5)">5</button>
             <button class="tbtn" onclick="setTgt(7)">7</button>
             <button class="tbtn" onclick="setTgt(11)">11</button>
+          </div>
+        </div>
+
+        <!-- ═══ ONLINE CARD — compact ═══ -->
+        <div class="online-card">
+          <!-- Header: status dot + label + Yapılandır -->
+          <div class="online-card-hd">
+            <div class="online-card-title">
+              <div class="oc-status-dot" id="oc-dot"></div>
+              <span id="oc-status-txt">Çevrimdışı</span>
+              <span class="oc-status-code" id="oc-status-code"></span>
+            </div>
+            <div class="online-card-cfg" onclick="openFbModal()">Yapılandır</div>
+          </div>
+
+          <!-- Body: only shown when connected -->
+          <div class="online-card-body" id="oc-body" style="display:none;">
+
+            <!-- Odadayken: kod + paylaş + çık -->
+            <div id="oc-in-room" style="display:none;">
+              <div class="oc-room-inline">
+                <div class="oc-room-code-lbl" id="oc-room-num" onclick="copyRoomCode()">——</div>
+                <button class="oc-btn share" onclick="shareRoom()">🔗 Paylaş</button>
+                <button class="oc-btn danger" onclick="leaveRoom()">🚪 Çık</button>
+              </div>
+            </div>
+
+            <!-- Bağlı ama oda yok: kod gir veya yeni oda -->
+            <div id="oc-no-room" style="display:none;">
+              <div class="oc-join-row">
+                <input class="oc-join-input" id="oc-join-inp" placeholder="Oda Kodu"
+                  maxlength="6" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"/>
+                <button class="oc-btn primary" onclick="joinRoomFromSetup()">GİR</button>
+                <button class="oc-btn secondary" onclick="createRoom()">➕ YENİ</button>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1003,7 +1076,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="settings-row" onclick="openFbModal()" style="cursor:pointer;">
             <div class="settings-row-info">
               <div class="settings-row-title">🔥 Firebase Bağlantısı</div>
-              <div class="settings-row-sub" id="settings-fb-status">Yapılandırılmamış</div>
+              <div class="settings-row-sub" id="settings-fb-status">Firebase yapılandır &amp; oda yönet</div>
             </div>
             <div style="font-size:18px;">›</div>
           </div>
@@ -1102,7 +1175,7 @@ function nav(p){
     if(nb) nb.classList.toggle('on',x===p);
   });
   D.activePage=p;
-  if(p==='setup'){renderColorPickers();updatePcardIcons();}
+  if(p==='setup'){renderColorPickers();updatePcardIcons();updateSetupOnlineCard();}
   if(p==='matches') renderMatches();
   if(p==='stats') renderStats();
   if(p==='settings') renderRecordInfo();
@@ -1593,6 +1666,8 @@ function setConnUI(online, state){
     if(chip){chip.className='sco-chip '+(fbRoomCode?'live':'syncing');}
     if(chipTxt)chipTxt.textContent=fbRoomCode?'🔴 CANLI · '+fbRoomCode:'Bağlı · Oda yok';
     const sc=document.getElementById('share-chip');if(sc)sc.style.display=fbRoomCode?'inline-flex':'none';
+    updateSetupOnlineCard();
+    updateFbModal();
     if(st)st.textContent=fbRoomCode?'Oda: '+fbRoomCode:'Bağlı, oda seçilmedi';
   } else {
     if(fill){fill.className='conn-bar-fill'+(state==='err'?' error':'');}
@@ -1621,34 +1696,28 @@ function initFbModalListener(){document.getElementById('fb-modal').addEventListe
 
 function updateFbModal(){
   const cfg=getFbCfg();
-  const cfgSection=document.getElementById('cfg-section');
-  const roomSection=document.getElementById('room-section');
-  const joinSection=document.getElementById('join-section');
   const statusRow=document.getElementById('fb-status-row');
   const pill=document.getElementById('fb-status-pill');
   const pillTxt=document.getElementById('fb-status-txt');
-
   if(fbConnected){
-    // hide cfg, show status
-    cfgSection.style.display='block'; // always show cfg for re-config
     statusRow.style.display='block';
     pill.className='fb-status-pill';
     pillTxt.textContent='🟢 Firebase bağlı';
-    if(fbRoomCode){
-      // in a room
-      roomSection.style.display='block';
-      joinSection.style.display='none';
-      document.getElementById('room-code-display').textContent=fbRoomCode;
-    } else {
-      roomSection.style.display='none';
-      joinSection.style.display='block';
-    }
   } else {
     statusRow.style.display=cfg?'block':'none';
-    if(cfg){pill.className='fb-status-pill warn';pillTxt.textContent='⚠️ Bağlanıyor...';}
-    cfgSection.style.display='block';
-    roomSection.style.display='none';
-    joinSection.style.display='none';
+    if(cfg&&statusRow.style.display!=='none'){
+      pill.className='fb-status-pill warn';
+      pillTxt.textContent='⚠️ Bağlanıyor...';
+    }
+  }
+  // prefill inputs from saved config
+  if(cfg){
+    const a=document.getElementById('cfg-apiKey');
+    const d=document.getElementById('cfg-dbUrl');
+    const p=document.getElementById('cfg-projectId');
+    if(a&&!a.value)a.value=cfg.apiKey||'';
+    if(d&&!d.value)d.value=cfg.dbUrl||'';
+    if(p&&!p.value)p.value=cfg.projectId||'';
   }
 }
 
@@ -1661,7 +1730,7 @@ function saveFirebaseConfig(){
   const cfg={apiKey,dbUrl,projectId};
   saveFbCfg(cfg);
   const ok=initFirebase(cfg);
-  if(ok){showToast('🔥 Firebase bağlandı!');}
+  if(ok){showToast('🔥 Firebase bağlandı!');setTimeout(()=>{closeFbModal();updateSetupOnlineCard();},600);}
   else{showToast('❌ Bağlantı hatası — URL ve Key\u2019i kontrol et');}
   updateFbModal();
 }
@@ -1675,6 +1744,12 @@ function createRoom(){
 function joinRoom(){
   if(!fbDb){showToast('❌ Önce Firebase yapılandır');return;}
   const code=document.getElementById('join-code-inp').value.trim().toUpperCase();
+  if(code.length<4){showToast('❌ Geçerli bir oda kodu gir');return;}
+  joinRoomByCode(code,false);
+}
+function joinRoomFromSetup(){
+  if(!fbDb){showToast('❌ Önce Firebase yapılandır');openFbModal();return;}
+  const code=document.getElementById('oc-join-inp').value.trim().toUpperCase();
   if(code.length<4){showToast('❌ Geçerli bir oda kodu gir');return;}
   joinRoomByCode(code,false);
 }
@@ -1695,7 +1770,9 @@ function joinRoomByCode(code,isCreate){
       showToast('✅ Oda oluşturuldu: '+code);
       subscribeRoom();
       registerViewer();
+      updateSetupOnlineCard();
       updateFbModal();
+      closeFbModal();
       setConnUI(true);
     }).catch(e=>{showToast('❌ Oda oluşturulamadı: '+e.message);});
   } else {
@@ -1705,7 +1782,9 @@ function joinRoomByCode(code,isCreate){
       showToast('✅ Odaya katıldın: '+code);
       subscribeRoom();
       registerViewer();
+      updateSetupOnlineCard();
       updateFbModal();
+      closeFbModal();
       setConnUI(true);
       // load remote state immediately
       applyRemoteData(snap.val());
@@ -1720,7 +1799,9 @@ function leaveRoom(){
   fbRoomCode=null;fbRoomRef=null;fbViewRef=null;
   saveRoomCode(null);
   setConnUI(true);
+  updateSetupOnlineCard();
   updateFbModal();
+  closeFbModal();
   showToast('👋 Odadan çıkıldı');
 }
 
