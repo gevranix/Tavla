@@ -10,6 +10,9 @@
 <title>Tavla Pro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<!-- Firebase v9 compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
 :root{
@@ -487,9 +490,166 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .pop{animation:score-pop .4s ease;}
 @keyframes slide-up{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .slide-up{animation:slide-up .3s ease;}
+
+/* ══════════════════════════════════════════════
+   ONLINE / FIREBASE ROOM SYSTEM
+══════════════════════════════════════════════ */
+
+/* Connection status bar */
+.conn-bar{position:fixed;top:calc(var(--safe-top) + 0px);left:0;right:0;z-index:200;
+  height:3px;background:var(--border);overflow:hidden;}
+.conn-bar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent1),var(--accent2));
+  transition:width .4s,background .4s;}
+.conn-bar-fill.online{width:100%;background:linear-gradient(90deg,#28a848,#40d060);}
+.conn-bar-fill.error{width:100%;background:linear-gradient(90deg,#c0392b,#e74c3c);}
+
+/* Online badge in header */
+.online-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;
+  border:1px solid var(--border);background:var(--card2);color:var(--muted2);
+  cursor:pointer;transition:all .2s;user-select:none;}
+.online-badge.connected{background:rgba(40,168,72,.15);border-color:rgba(40,168,72,.4);color:#40d060;}
+.online-badge.syncing{background:rgba(200,146,42,.15);border-color:rgba(200,146,42,.4);color:var(--accent2);}
+.online-badge-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.online-badge.connected .online-badge-dot{animation:pulse-dot 1.8s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* Firebase config modal */
+.fb-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;
+  display:flex;align-items:flex-end;justify-content:center;padding-bottom:var(--safe-bot);}
+.fb-modal-bg.hidden{display:none;}
+.fb-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:24px 24px 0 0;
+  width:100%;max-width:480px;padding:24px 20px 32px;max-height:90vh;overflow-y:auto;}
+.fb-modal-drag{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px;}
+.fb-modal-title{font-family:'Cinzel',serif;font-size:16px;font-weight:700;color:var(--text);
+  text-align:center;margin-bottom:6px;}
+.fb-modal-sub{font-size:12px;color:var(--muted2);text-align:center;margin-bottom:20px;line-height:1.5;}
+
+/* Room section inside config */
+.room-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;}
+.room-section-title{font-size:10px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;margin-bottom:12px;}
+.room-code-display{font-family:'Cinzel',serif;font-size:32px;font-weight:900;
+  color:var(--accent2);letter-spacing:8px;text-align:center;padding:12px 0;
+  border:2px dashed var(--border2);border-radius:12px;margin-bottom:10px;
+  cursor:pointer;transition:all .2s;}
+.room-code-display:active{transform:scale(.97);}
+.room-code-hint{font-size:10px;color:var(--muted);text-align:center;margin-bottom:12px;}
+.room-input-row{display:flex;gap:8px;margin-bottom:8px;}
+.room-input{flex:1;background:var(--bg3);border:1px solid var(--border2);color:var(--text);
+  padding:12px 14px;border-radius:12px;font-size:15px;font-weight:700;letter-spacing:3px;
+  text-transform:uppercase;text-align:center;outline:none;font-family:'Cinzel',serif;}
+.room-input::placeholder{color:var(--muted);letter-spacing:1px;font-size:13px;font-weight:400;}
+.room-btn{padding:12px 18px;border-radius:12px;border:none;cursor:pointer;font-size:13px;
+  font-weight:700;letter-spacing:1px;transition:all .2s;font-family:'Nunito',sans-serif;}
+.room-btn:active{transform:scale(.95);}
+.room-btn.join{background:linear-gradient(135deg,var(--accent1),var(--accent2));color:var(--bg);}
+.room-btn.create{background:var(--card2);border:1px solid var(--border2);color:var(--text2);}
+.room-btn.leave{background:rgba(192,57,43,.2);border:1px solid rgba(192,57,43,.4);color:#e74c3c;}
+.room-btn.full{width:100%;padding:14px;font-size:14px;margin-top:4px;}
+
+/* Firebase config inputs */
+.fb-cfg-section{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:16px;margin-bottom:12px;}
+.fb-cfg-title{font-size:10px;letter-spacing:2px;color:var(--muted2);text-transform:uppercase;margin-bottom:12px;}
+.fb-cfg-row{margin-bottom:10px;}
+.fb-cfg-lbl{font-size:11px;color:var(--muted2);margin-bottom:4px;}
+.fb-cfg-inp{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  padding:10px 12px;border-radius:10px;font-size:12px;outline:none;font-family:monospace;}
+.fb-cfg-inp:focus{border-color:var(--border2);}
+.fb-save-btn{width:100%;padding:14px;border-radius:14px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent1),var(--accent2));color:var(--bg);
+  font-size:15px;font-weight:800;font-family:'Cinzel',serif;letter-spacing:2px;
+  margin-top:4px;transition:all .2s;}
+.fb-save-btn:active{transform:scale(.97);}
+.fb-status-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;
+  border-radius:20px;font-size:11px;font-weight:700;margin:0 auto 12px;
+  background:rgba(40,168,72,.15);border:1px solid rgba(40,168,72,.4);color:#40d060;}
+.fb-status-pill.warn{background:rgba(200,146,42,.15);border-color:rgba(200,146,42,.4);color:var(--accent2);}
+.fb-status-pill.err{background:rgba(192,57,43,.15);border-color:rgba(192,57,43,.4);color:#e74c3c;}
+
+/* Online indicator on score page */
+.score-online-row{display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:6px 0 2px;}
+.sco-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;
+  border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1px;
+  background:var(--card2);border:1px solid var(--border);color:var(--muted2);
+  cursor:pointer;transition:all .2s;}
+.sco-chip.live{background:rgba(40,168,72,.15);border-color:rgba(40,168,72,.35);color:#40d060;}
+.sco-chip.syncing{background:rgba(200,146,42,.12);border-color:rgba(200,146,42,.35);color:var(--accent2);}
+.sco-chip-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.sco-chip.live .sco-chip-dot{animation:pulse-dot 1.8s infinite;}
+
+/* Viewer count */
+.viewer-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;
+  border-radius:20px;font-size:10px;font-weight:700;
+  background:var(--card);border:1px solid var(--border);color:var(--muted2);}
 </style>
 </head>
 <body>
+<div class="conn-bar"><div class="conn-bar-fill" id="conn-fill"></div></div>
+
+<!-- Firebase Config & Room Modal -->
+<div class="fb-modal-bg hidden" id="fb-modal">
+  <div class="fb-modal">
+    <div class="fb-modal-drag"></div>
+    <div class="fb-modal-title">🔥 Online Bağlantı</div>
+    <div class="fb-modal-sub" id="fb-modal-sub">Firebase ile tüm oyuncular aynı skoru gerçek zamanlı takip eder.</div>
+
+    <!-- Connection status -->
+    <div id="fb-status-row" style="text-align:center;margin-bottom:14px;display:none;">
+      <div class="fb-status-pill" id="fb-status-pill">
+        <div style="width:7px;height:7px;border-radius:50%;background:currentColor;"></div>
+        <span id="fb-status-txt">Bağlı</span>
+      </div>
+    </div>
+
+    <!-- Room section (shown when connected) -->
+    <div class="room-section" id="room-section" style="display:none;">
+      <div class="room-section-title">Aktif Oda</div>
+      <div class="room-code-display" id="room-code-display" onclick="copyRoomCode()" title="Kopyala">——</div>
+      <div class="room-code-hint">👆 Kodu paylaş → arkadaşlar aynı odaya katılsın</div>
+      <div style="display:flex;gap:8px;">
+        <button class="room-btn leave full" onclick="leaveRoom()">🚪 Odadan Çık</button>
+      </div>
+    </div>
+
+    <!-- Join/Create room (shown when connected but no room) -->
+    <div class="room-section" id="join-section" style="display:none;">
+      <div class="room-section-title">Odaya Katıl veya Oluştur</div>
+      <div class="room-input-row">
+        <input class="room-input" id="join-code-inp" placeholder="Oda Kodu" maxlength="6"
+          oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')" />
+        <button class="room-btn join" onclick="joinRoom()">GİR</button>
+      </div>
+      <button class="room-btn create full" onclick="createRoom()">➕ Yeni Oda Oluştur</button>
+    </div>
+
+    <!-- Firebase config (shown when not configured) -->
+    <div class="fb-cfg-section" id="cfg-section">
+      <div class="fb-cfg-title">Firebase Ayarları</div>
+      <div class="fb-cfg-row">
+        <div class="fb-cfg-lbl">API Key</div>
+        <input class="fb-cfg-inp" id="cfg-apiKey" placeholder="AIzaSy..."/>
+      </div>
+      <div class="fb-cfg-row">
+        <div class="fb-cfg-lbl">Database URL</div>
+        <input class="fb-cfg-inp" id="cfg-dbUrl" placeholder="https://proje-xxx.firebaseio.com"/>
+      </div>
+      <div class="fb-cfg-row">
+        <div class="fb-cfg-lbl">Project ID</div>
+        <input class="fb-cfg-inp" id="cfg-projectId" placeholder="proje-id"/>
+      </div>
+      <button class="fb-save-btn" onclick="saveFirebaseConfig()">🔥 BAĞLAN</button>
+      <div style="margin-top:12px;font-size:10px;color:var(--muted);text-align:center;line-height:1.6;">
+        <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent2);text-decoration:none;">
+          console.firebase.google.com</a> → Proje oluştur → Realtime Database → Kural: <code style="color:var(--text2);">".read":true, ".write":true</code>
+      </div>
+    </div>
+
+    <button class="room-btn create full" onclick="closeFbModal()" style="margin-top:4px;">Kapat</button>
+  </div>
+</div>
+
 <div class="app" id="app">
 
   <!-- HEADER -->
@@ -583,6 +743,20 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <!-- SCORE -->
     <div class="page hidden" id="pg-score">
       <div class="inner">
+
+        <!-- Online status chip -->
+        <div class="score-online-row">
+          <div class="sco-chip" id="sco-chip" onclick="openFbModal()" title="Online Ayarlar">
+            <div class="sco-chip-dot"></div>
+            <span id="sco-chip-txt">Çevrimdışı</span>
+          </div>
+          <div class="viewer-chip" id="viewer-chip" style="display:none;">
+            👁 <span id="viewer-count">1</span> izliyor
+          </div>
+          <div class="sco-chip" id="share-chip" style="display:none;" onclick="shareRoom()">
+            🔗 Paylaş
+          </div>
+        </div>
 
         <div class="scoreboard">
           <div class="sb-top">
@@ -694,20 +868,6 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <div class="card-body" id="hall-of-fame"></div>
         </div>
         <button class="go-btn" onclick="nav('setup')" style="margin-top:4px;">🔄 &nbsp;YENİ MAÇ</button>
-<button class="go-btn" onclick="openRoomPanel()" style="margin-top:10px;">
-🔗 &nbsp;ONLINE ODA
-</button>
-
-<div id="room-panel" style="display:none;margin-top:12px;background:var(--card);padding:14px;border-radius:16px;border:1px solid var(--border);">
-  <input id="room-name" placeholder="Oda adı"
-    style="width:100%;padding:12px;margin-bottom:8px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);">
-
-  <input id="room-pass" type="password" placeholder="Şifre"
-    style="width:100%;padding:12px;margin-bottom:8px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);">
-
-  <button class="go-btn" onclick="joinRoom()">ODAYA BAĞLAN</button>
-</div>
-
         <div style="height:4px;"></div>
       </div>
     </div>
@@ -836,6 +996,17 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
           <button class="export-btn" onclick="document.getElementById('import-input').click()">📥 &nbsp;Verileri İçe Aktar</button>
           <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)"/>
           <button class="export-btn" onclick="shareText()">📋 &nbsp;Maç Özetini Kopyala</button>
+        </div>
+
+        <div class="settings-section" style="margin-top:8px;">
+          <div class="settings-lbl">Online Senkronizasyon</div>
+          <div class="settings-row" onclick="openFbModal()" style="cursor:pointer;">
+            <div class="settings-row-info">
+              <div class="settings-row-title">🔥 Firebase Bağlantısı</div>
+              <div class="settings-row-sub" id="settings-fb-status">Yapılandırılmamış</div>
+            </div>
+            <div style="font-size:18px;">›</div>
+          </div>
         </div>
 
         <div class="settings-section" style="margin-top:4px;">
@@ -1270,7 +1441,11 @@ function renderRecordInfo(){
   const total=D.matches.length;
   const totalG=D.matches.reduce((s,m)=>s+m.games.length,0);
   const kb=Math.round(JSON.stringify(D).length/102.4)/10;
+  const roomTxt=fbRoomCode?`<div class="record-info-row"><span class="record-info-lbl">Online oda</span><span class="record-info-val" style="font-size:14px;letter-spacing:3px;">${fbRoomCode}</span></div>`:'';
+  const connTxt=`<div class="record-info-row"><span class="record-info-lbl">Firebase</span><span class="record-info-val" style="${fbConnected?'color:#40d060':'color:var(--muted2)'}">${fbConnected?'Bağlı':'Bağlı Değil'}</span></div>`;
   el.innerHTML=`
+    ${roomTxt}
+    ${connTxt}
     <div class="record-info-row"><span class="record-info-lbl">Kayıtlı maç</span><span class="record-info-val">${total}</span></div>
     <div class="record-info-row"><span class="record-info-lbl">Toplam oyun</span><span class="record-info-val">${totalG}</span></div>
     <div class="record-info-row"><span class="record-info-lbl">Depolama boyutu</span><span class="record-info-val">${kb} KB</span></div>`;
@@ -1348,6 +1523,331 @@ function applySettings(){
   applyPlayerColors();
 }
 
+
+/* ════════════════════════════════════════════════════════════
+   FIREBASE REALTIME SYNC ENGINE
+   Oda kodu: 6 karakterli random alfanumerik
+   Sync: score, games, finished, p1, p2, target, matches
+════════════════════════════════════════════════════════════ */
+let fbApp=null, fbDb=null, fbRoomRef=null, fbViewRef=null;
+let fbConnected=false, fbRoomCode=null, fbIsHost=false;
+let fbUnsubscribe=null, fbViewUnsubscribe=null;
+let fbRemoteUpdate=false; // flag: prevent echo loop
+
+const FB_CFG_KEY='tavla_fb_cfg';
+const FB_ROOM_KEY='tavla_fb_room';
+
+// ─── Config persistence ───────────────────────────────────────────────────────
+function getFbCfg(){try{return JSON.parse(localStorage.getItem(FB_CFG_KEY)||'null');}catch{return null;}}
+function saveFbCfg(c){localStorage.setItem(FB_CFG_KEY,JSON.stringify(c));}
+function getSavedRoom(){return localStorage.getItem(FB_ROOM_KEY)||null;}
+function saveRoomCode(code){if(code)localStorage.setItem(FB_ROOM_KEY,code);else localStorage.removeItem(FB_ROOM_KEY);}
+
+// ─── Generate room code ───────────────────────────────────────────────────────
+function genCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s='';for(let i=0;i<6;i++)s+=chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+
+// ─── Init Firebase from saved config ─────────────────────────────────────────
+function initFirebase(cfg){
+  if(!cfg||!cfg.apiKey||!cfg.dbUrl)return false;
+  try{
+    if(fbApp){
+      // already initialized, just reconnect
+      fbDb=firebase.database(fbApp);
+      fbConnected=true;
+      setConnUI(true);
+      return true;
+    }
+    fbApp=firebase.initializeApp({
+      apiKey:cfg.apiKey,
+      databaseURL:cfg.dbUrl,
+      projectId:cfg.projectId||'',
+    },'tavla-pro');
+    fbDb=firebase.database(fbApp);
+    // connection state listener
+    fbDb.ref('.info/connected').on('value',snap=>{
+      const isConn=snap.val()===true;
+      fbConnected=isConn;
+      setConnUI(isConn);
+      if(isConn&&fbRoomCode) joinRoomByCode(fbRoomCode);
+    });
+    return true;
+  }catch(e){
+    console.error('Firebase init error',e);
+    setConnUI(false,'err');
+    return false;
+  }
+}
+
+// ─── UI helpers ──────────────────────────────────────────────────────────────
+function setConnUI(online, state){
+  const fill=document.getElementById('conn-fill');
+  const chip=document.getElementById('sco-chip');
+  const chipTxt=document.getElementById('sco-chip-txt');
+  const st=document.getElementById('settings-fb-status');
+  if(online){
+    if(fill){fill.className='conn-bar-fill online';}
+    if(chip){chip.className='sco-chip '+(fbRoomCode?'live':'syncing');}
+    if(chipTxt)chipTxt.textContent=fbRoomCode?'🔴 CANLI · '+fbRoomCode:'Bağlı · Oda yok';
+    const sc=document.getElementById('share-chip');if(sc)sc.style.display=fbRoomCode?'inline-flex':'none';
+    if(st)st.textContent=fbRoomCode?'Oda: '+fbRoomCode:'Bağlı, oda seçilmedi';
+  } else {
+    if(fill){fill.className='conn-bar-fill'+(state==='err'?' error':'');}
+    if(chip){chip.className='sco-chip';}
+    if(chipTxt)chipTxt.textContent='Çevrimdışı';
+    if(st)st.textContent='Yapılandırılmamış';
+  }
+  updateFbModal();
+}
+
+// ─── Modal ────────────────────────────────────────────────────────────────────
+function openFbModal(){
+  const cfg=getFbCfg();
+  const modal=document.getElementById('fb-modal');
+  modal.classList.remove('hidden');
+  // prefill cfg
+  if(cfg){
+    document.getElementById('cfg-apiKey').value=cfg.apiKey||'';
+    document.getElementById('cfg-dbUrl').value=cfg.dbUrl||'';
+    document.getElementById('cfg-projectId').value=cfg.projectId||'';
+  }
+  updateFbModal();
+}
+function closeFbModal(){document.getElementById('fb-modal').classList.add('hidden');}
+document.getElementById('fb-modal').addEventListener('click',e=>{if(e.target===document.getElementById('fb-modal'))closeFbModal();});
+
+function updateFbModal(){
+  const cfg=getFbCfg();
+  const cfgSection=document.getElementById('cfg-section');
+  const roomSection=document.getElementById('room-section');
+  const joinSection=document.getElementById('join-section');
+  const statusRow=document.getElementById('fb-status-row');
+  const pill=document.getElementById('fb-status-pill');
+  const pillTxt=document.getElementById('fb-status-txt');
+
+  if(fbConnected){
+    // hide cfg, show status
+    cfgSection.style.display='block'; // always show cfg for re-config
+    statusRow.style.display='block';
+    pill.className='fb-status-pill';
+    pillTxt.textContent='🟢 Firebase bağlı';
+    if(fbRoomCode){
+      // in a room
+      roomSection.style.display='block';
+      joinSection.style.display='none';
+      document.getElementById('room-code-display').textContent=fbRoomCode;
+    } else {
+      roomSection.style.display='none';
+      joinSection.style.display='block';
+    }
+  } else {
+    statusRow.style.display=cfg?'block':'none';
+    if(cfg){pill.className='fb-status-pill warn';pillTxt.textContent='⚠️ Bağlanıyor...';}
+    cfgSection.style.display='block';
+    roomSection.style.display='none';
+    joinSection.style.display='none';
+  }
+}
+
+// ─── Save config & connect ────────────────────────────────────────────────────
+function saveFirebaseConfig(){
+  const apiKey=document.getElementById('cfg-apiKey').value.trim();
+  const dbUrl=document.getElementById('cfg-dbUrl').value.trim();
+  const projectId=document.getElementById('cfg-projectId').value.trim();
+  if(!apiKey||!dbUrl){showToast('❌ API Key ve Database URL zorunlu');return;}
+  const cfg={apiKey,dbUrl,projectId};
+  saveFbCfg(cfg);
+  const ok=initFirebase(cfg);
+  if(ok){showToast('🔥 Firebase bağlandı!');}
+  else{showToast('❌ Bağlantı hatası — URL ve Key'i kontrol et');}
+  updateFbModal();
+}
+
+// ─── Room create / join / leave ───────────────────────────────────────────────
+function createRoom(){
+  if(!fbDb){showToast('❌ Önce Firebase yapılandır');return;}
+  const code=genCode();
+  joinRoomByCode(code,true);
+}
+function joinRoom(){
+  if(!fbDb){showToast('❌ Önce Firebase yapılandır');return;}
+  const code=document.getElementById('join-code-inp').value.trim().toUpperCase();
+  if(code.length<4){showToast('❌ Geçerli bir oda kodu gir');return;}
+  joinRoomByCode(code,false);
+}
+function joinRoomByCode(code,isCreate){
+  if(fbUnsubscribe){fbUnsubscribe();fbUnsubscribe=null;}
+  if(fbViewUnsubscribe){fbViewUnsubscribe();fbViewUnsubscribe=null;}
+
+  fbRoomCode=code;
+  fbIsHost=!!isCreate;
+  saveRoomCode(code);
+
+  const roomRef=fbDb.ref('rooms/'+code);
+  fbRoomRef=roomRef;
+
+  if(isCreate){
+    // push current state to room
+    roomRef.set(getFirebasePayload()).then(()=>{
+      showToast('✅ Oda oluşturuldu: '+code);
+      subscribeRoom();
+      registerViewer();
+      updateFbModal();
+      setConnUI(true);
+    }).catch(e=>{showToast('❌ Oda oluşturulamadı: '+e.message);});
+  } else {
+    // check if room exists
+    roomRef.once('value').then(snap=>{
+      if(!snap.exists()){showToast('❌ Oda bulunamadı: '+code);fbRoomCode=null;saveRoomCode(null);return;}
+      showToast('✅ Odaya katıldın: '+code);
+      subscribeRoom();
+      registerViewer();
+      updateFbModal();
+      setConnUI(true);
+      // load remote state immediately
+      applyRemoteData(snap.val());
+    }).catch(e=>{showToast('❌ Katılma hatası: '+e.message);});
+  }
+}
+
+function leaveRoom(){
+  if(fbViewRef)fbViewRef.remove();
+  if(fbUnsubscribe){fbUnsubscribe();fbUnsubscribe=null;}
+  if(fbViewUnsubscribe){fbViewUnsubscribe();fbViewUnsubscribe=null;}
+  fbRoomCode=null;fbRoomRef=null;fbViewRef=null;
+  saveRoomCode(null);
+  setConnUI(true);
+  updateFbModal();
+  showToast('👋 Odadan çıkıldı');
+}
+
+// ─── Subscribe to room changes ────────────────────────────────────────────────
+function subscribeRoom(){
+  if(!fbRoomRef)return;
+  const handler=fbRoomRef.on('value',snap=>{
+    if(!snap.exists())return;
+    const data=snap.val();
+    if(!fbRemoteUpdate) applyRemoteData(data);
+  });
+  fbUnsubscribe=()=>fbRoomRef.off('value',handler);
+}
+
+function applyRemoteData(data){
+  if(!data)return;
+  fbRemoteUpdate=true;
+  // Only update game fields, not local settings/theme
+  const prev=D.activePage;
+  if(data.p1!==undefined)D.p1=data.p1;
+  if(data.p2!==undefined)D.p2=data.p2;
+  if(data.target!==undefined)D.target=data.target;
+  if(data.score1!==undefined)D.score1=data.score1;
+  if(data.score2!==undefined)D.score2=data.score2;
+  if(data.games!==undefined)D.games=data.games||[];
+  if(data.finished!==undefined)D.finished=data.finished;
+  if(data.matches!==undefined)D.matches=data.matches||[];
+  save();
+  renderScore();
+  if(D.activePage==='matches')renderMatches();
+  if(D.activePage==='stats')renderStats();
+  // if a match just finished remotely, show winner screen
+  if(D.finished && document.getElementById('win-sheet').style.bottom!=='0px'){
+    setTimeout(()=>{if(D.finished)showWinner();},300);
+  }
+  // update setup inputs
+  const i1=document.getElementById('inp1'),i2=document.getElementById('inp2');
+  if(i1&&D.p1!=='Oyuncu 1')i1.value=D.p1;
+  if(i2&&D.p2!=='Oyuncu 2')i2.value=D.p2;
+  setTimeout(()=>{fbRemoteUpdate=false;},100);
+}
+
+// ─── Push local changes to Firebase ─────────────────────────────────────────
+function pushToFirebase(){
+  if(!fbRoomRef||!fbConnected)return;
+  fbRemoteUpdate=true;
+  fbRoomRef.set(getFirebasePayload()).catch(e=>console.warn('FB push err',e));
+  setTimeout(()=>{fbRemoteUpdate=false;},200);
+}
+
+function getFirebasePayload(){
+  return {
+    p1:D.p1, p2:D.p2, target:D.target,
+    score1:D.score1, score2:D.score2,
+    games:D.games||[], finished:D.finished,
+    matches:D.matches||[],
+    updatedAt:Date.now()
+  };
+}
+
+// ─── Viewer presence ─────────────────────────────────────────────────────────
+function registerViewer(){
+  if(!fbRoomRef)return;
+  const vid='v_'+Math.random().toString(36).slice(2,8);
+  fbViewRef=fbRoomRef.child('_viewers/'+vid);
+  fbViewRef.set({at:Date.now()});
+  fbViewRef.onDisconnect().remove();
+  // watch viewer count
+  const handler=fbRoomRef.child('_viewers').on('value',snap=>{
+    const count=snap.numChildren();
+    const vc=document.getElementById('viewer-count');
+    const vchip=document.getElementById('viewer-chip');
+    if(vc)vc.textContent=count;
+    if(vchip)vchip.style.display=count>0?'inline-flex':'none';
+  });
+  fbViewUnsubscribe=()=>fbRoomRef.child('_viewers').off('value',handler);
+}
+
+
+function shareRoom(){
+  if(!fbRoomCode){openFbModal();return;}
+  const url=window.location.href.split('?')[0]+'?room='+fbRoomCode;
+  const txt='🎲 Tavla Pro - Canlı Skoru İzle\nOda: '+fbRoomCode+'\n'+url;
+  if(navigator.share){navigator.share({title:'Tavla Pro',text:txt,url:url}).catch(()=>{});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(url).then(()=>showToast('🔗 Link kopyalandı: '+fbRoomCode));}
+}
+
+// ─── Copy room code ───────────────────────────────────────────────────────────
+function copyRoomCode(){
+  if(!fbRoomCode)return;
+  const url=window.location.href.split('?')[0]+'?room='+fbRoomCode;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(()=>showToast('📋 Bağlantı kopyalandı!\n'+fbRoomCode));
+  } else {
+    const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();
+    document.execCommand('copy');ta.remove();showToast('📋 Kopyalandı: '+fbRoomCode);
+  }
+}
+
+// ─── URL param auto-join ──────────────────────────────────────────────────────
+function checkUrlRoom(){
+  const params=new URLSearchParams(window.location.search);
+  const roomParam=params.get('room');
+  if(roomParam&&roomParam.length>=4){
+    const cfg=getFbCfg();
+    if(cfg&&initFirebase(cfg)){
+      setTimeout(()=>joinRoomByCode(roomParam.toUpperCase(),false),800);
+    }
+  } else {
+    const saved=getSavedRoom();
+    if(saved){
+      const cfg=getFbCfg();
+      if(cfg&&initFirebase(cfg)){
+        setTimeout(()=>joinRoomByCode(saved,false),800);
+      }
+    }
+  }
+}
+
+/* ─── PATCH save() to also push to Firebase ─────────────────────────────────*/
+const _origSave=save;
+// Override save with Firebase push
+function save(){
+  localStorage.setItem('tavla_pro3',JSON.stringify(D));
+  if(!fbRemoteUpdate&&fbRoomRef&&fbConnected) pushToFirebase();
+}
+
 /* ═══════════════ CONFETTI ═══════════════ */
 const cfColors=['#c8922a','#e74c3c','#f5d080','#40d060','#4ba0e8','#aa4be8','#e8b84b'];
 function spawnCf(n,dur){
@@ -1374,133 +1874,19 @@ document.getElementById('inp2').value=D.p2==='Oyuncu 2'?'':D.p2;
 renderScore();
 renderColorPickers();
 nav(D.activePage||'score');
-</script>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAqxjy4XCK-t5ieAIGVBaGfxwqT8R4yYhY",
-  authDomain: "tavla49.firebaseapp.com",
-  projectId: "tavla49",
-  storageBucket: "tavla49.firebasestorage.app",
-  messagingSenderId: "621933766",
-  appId: "1:621933766:web:801d7ad90c4795445d53c7"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-let roomRef = null;
-
-window.openRoomPanel = function(){
-  const p = document.getElementById("room-panel");
-  p.style.display = p.style.display === "none" ? "block" : "none";
-}
-
-window.joinRoom = async function(){
-
-  const room = document.getElementById("room-name").value.trim();
-  const pass = document.getElementById("room-pass").value.trim();
-
-  if(!room || !pass){
-    alert("Oda adı ve şifre giriniz");
-    return;
+// ── Firebase auto-init & room auto-rejoin ──────────────────────────────────
+(function(){
+  const cfg = getFbCfg();
+  if(cfg && cfg.apiKey && cfg.dbUrl){
+    try{
+      initFirebase(cfg);
+      // Small delay to let Firebase connect then auto-rejoin
+      setTimeout(checkUrlRoom, 600);
+    }catch(e){console.warn('Firebase auto-init failed', e);}
   }
+})();
 
-  roomRef = doc(db, "rooms", room);
-
-  const snap = await getDoc(roomRef);
-
-  if(snap.exists()){
-
-    const d = snap.data();
-
-    if(d.password !== pass){
-      alert("Şifre yanlış");
-      return;
-    }
-
-  } else {
-
-    await setDoc(roomRef, {
-      password: pass,
-      score1: 0,
-      score2: 0,
-      games: []
-    });
-
-  }
-
-  localStorage.setItem("tavla_room", room);
-  localStorage.setItem("tavla_pass", pass);
-
-  alert("Odaya bağlandı");
-
-  onSnapshot(roomRef, (snap)=>{
-
-    if(!snap.exists()) return;
-
-    const d = snap.data();
-
-    if(typeof score1 !== "undefined") score1 = d.score1 || 0;
-    if(typeof score2 !== "undefined") score2 = d.score2 || 0;
-    if(typeof games !== "undefined") games = d.games || [];
-
-    if(document.getElementById("sc1"))
-      document.getElementById("sc1").innerText = score1;
-
-    if(document.getElementById("sc2"))
-      document.getElementById("sc2").innerText = score2;
-  });
-
-}
-
-window.syncGame = async function(){
-
-  if(!roomRef) return;
-
-  await setDoc(roomRef, {
-    password: localStorage.getItem("tavla_pass"),
-    score1,
-    score2,
-    games,
-    updated: Date.now()
-  });
-
-}
 </script>
-
 </body>
 </html>
-
-
-<script>
-document.addEventListener("click", function(e){
-
-  const t = e.target;
-
-  if(
-    t.closest(".qa-player") ||
-    t.closest(".qa-type") ||
-    t.closest(".go-btn") ||
-    t.closest(".qa-undo")
-  ){
-
-    setTimeout(()=>{
-      if(typeof syncGame === "function"){
-        syncGame();
-      }
-    },300);
-
-  }
-
-});
-</script>
